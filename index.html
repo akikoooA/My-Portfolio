@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Portfolio</title>
+    <style>
+      
+
+
+      
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a; 
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+        }
+
+        .header {
+            padding: 5rem 1rem 3rem;
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+        }
+
+    
+        .pill-label {
+            background: #f0f0f0;
+            color: #555;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+
+        .body-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 650px;
+            width: 100%;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+
+    
+
+
+        .grid-item {
+            background: #fafafa;
+            border: 1px solid #eeeeee;
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+        .grid-item:hover {
+            background: #ffffff;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .label {
+            display: block;
+            color: #999;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .value {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+      
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="pill-label">Hello there!</div>
+        <h1>Scot Gerik P. Zamora</h1>
+        <p class="subtitle">Student </p>
+    </header>
+
+    <main class="body-container">
+        <div class="grid-item">
+            <span class="label">Age</span>
+            <span class="value">18 years old</span>
+        </div>
+
+        <div class="grid-item">
+            <span class="label">School</span>
+            <span class="value">Cavite State University Silang</span>
+        </div>
+
+        <div class="grid-item">
+            <span class="label">Hobby</span>
+            <span class="value">Badminton And Design</span>
+        </div>
+
+        <div class="grid-item">
+            <span class="label">Address</span>
+            <span class="value">Carmona, Cavite</span>
+        </div>
+
+       
+    </main>
+
+</body>
+</html>
