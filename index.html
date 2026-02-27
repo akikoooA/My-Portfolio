@@ -3,135 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Portfolio</title>
+    <title>Scot Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-      
-
-
-      
-        body {
+        * {
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #ffffff;
-            color: #1a1a1a; 
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            align-items: center;
-        }
-
-        .header {
-            padding: 5rem 1rem 3rem;
-            text-align: center;
-            width: 100%;
-            max-width: 600px;
-        }
-
-    
-        .pill-label {
-            background: #f0f0f0;
-            color: #555;
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 1rem;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin: 0;
-            letter-spacing: -1px;
-        }
-
-        .subtitle {
-            color: #666;
-            font-size: 1.1rem;
-            margin-top: 0.5rem;
-        }
-
-        .body-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            max-width: 650px;
-            width: 100%;
-            padding: 2rem;
             box-sizing: border-box;
         }
 
-    
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 5%;
+            position: absolute;
+            width: 100%;
+            z-index: 10;
+        }
 
 
-        .grid-item {
-            background: #fafafa;
-            border: 1px solid #eeeeee;
-            border-radius: 20px;
-            padding: 1.5rem;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #8a2be2;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+
+
+        .nav-links a {
+            text-decoration: none;
+            color: #ddd;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #fff;
+        }
+
+
+
+
+        .nav-links .active-pill {
+            background: #8a2be2;
+            padding: 5px 15px;
+            border-radius: 5px;
+            color: white !important;
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8%;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 500px;
+            z-index: 2;
+        }
+
+        .hero-content h2 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-content h2 span {
+            color: #8a2be2;
+        }
+
+        .hero-content h3 {
+            color: #8a2be2;
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-content p {
+            color: #bbbbbb;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .hero-image {
+            position: absolute;
+            right: 5%;
+            bottom: 0;
+            width: 50%;
+            height: 90%;
+            background: url(skat.jpg) no-repeat bottom center;
+            background-size: contain;
+            z-index: 1;
+        }
+
+        .portfolio-section {
+            padding: 80px 8%;
+            background-color: #050505;
+        }
+
+        .section-title {
+            text-align: left;
+            margin-bottom: 40px;
+        }
+
+        .section-title h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .section-title h2 span {
+            color: #8a2be2;
+        }
+
+        .work-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 1100px;
+        }
+
+        .work-item {
+            position: relative;
+            background: #0a0a0a; 
+            border-radius: 12px;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            border: 1px solid #222;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
-        }
-
-        .grid-item:hover {
-            background: #ffffff;
-            transform: translateY(-4px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-        }
-
-        .full-width {
-            grid-column: span 2;
-        }
-
-        .label {
             display: block;
-            color: #999;
-            font-size: 0.75rem;
-            font-weight: 700;
-            margin-bottom: 6px;
+            text-decoration: none;
+        }
+
+        .work-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; 
+            opacity: 0.7;
+            transition: 0.5s;
+            padding: 10px; 
+        }
+
+        .work-item:hover {
+            border-color: #8a2be2;
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.2);
+        }
+
+        .work-item:hover img {
+            opacity: 1;
+            transform: scale(1.02);
+        }
+
+        .work-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 25px 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 20%, transparent);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+
+
+
+
+        
+        .work-overlay h4 {
+            font-size: 1.25rem;
+            color: #fff;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .work-overlay h4 span {
+            color: #8a2be2;
+        }
+
+        .work-overlay p {
+            font-size: 0.85rem;
+            color: #8a2be2;
             text-transform: uppercase;
-        }
-
-        .value {
-            font-size: 1.1rem;
             font-weight: 500;
+            letter-spacing: 1px;
         }
 
-      
+        .social-sidebar {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        .social-sidebar a {
+            color: #fff;
+            font-size: 1.2rem;
+            text-decoration: none;
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+
+        .social-sidebar a:hover {
+            opacity: 1;
+            color: #8a2be2;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero { flex-direction: column; text-align: center; padding-top: 100px; height: auto; }
+            .hero-image { position: relative; width: 100%; height: 400px; right: 0; margin-top: 30px; }
+            .social-sidebar { flex-direction: row; position: relative; top: 0; right: 0; transform: none; justify-content: center; margin: 40px 0; }
+            .work-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <header class="header">
-        <div class="pill-label">Hello there!</div>
-        <h1>Scot Gerik P. Zamora</h1>
-        <p class="subtitle">Student </p>
-    </header>
+    <nav>
+        <div class="logo">Portfolio<span>.</span></div>
+        <ul class="nav-links">
+            <li><a href="#" class="active-pill">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Skills</a></li>
+            <li><a href="https://www.facebook.com/skatiiz">Contact</a></li>
+        </ul>
+    </nav>
 
-    <main class="body-container">
-        <div class="grid-item">
-            <span class="label">Age</span>
-            <span class="value">18 years old</span>
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Hi, I'm<span>_</span><br>Scot Zamora</h2>
+            <h3>Student</h3>
+            <p>
+               I am Scot Gerik Zamora. I'm honestly just obsessed with making things look good. Whether it’s a website, a poster, or some random digital art, I love the process of turning a blank screen into something cool.
+            </p>
         </div>
 
-        <div class="grid-item">
-            <span class="label">School</span>
-            <span class="value">Cavite State University Silang</span>
+        <div class="hero-image"></div>
+
+        <div class="social-sidebar">
+            <a href="https://www.facebook.com/skatiiz" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="https://www.instagram.com/skatt_04/" target="_blank"><i class="fab fa-instagram"></i></a>
+        </div>
+    </section>
+
+    <!-- Past Work Section -->
+    <section class="portfolio-section">
+        <div class="section-title">
+            <h2>Recent <span>Projects</span></h2>
+            <p style="color: #666; font-size: 0.9rem;">Check out some of my digital designs</p>
         </div>
 
-        <div class="grid-item">
-            <span class="label">Hobby</span>
-            <span class="value">Badminton And Design</span>
-        </div>
+        <div class="work-grid">
+            <!-- Project 1 -->
+            <a href="https://d-bayong-art.github.io/D-Bayong-Arttt/" class="work-item" target="_blank">
+                <img src="Screenshot 2026-02-27 154741.png" alt="D-Bayong Poster">
+                <div class="work-overlay">
+                    
+                    <h4>D-Bayong<span>_</span></h4>
+                </div>
+            </a>
 
-        <div class="grid-item">
-            <span class="label">Address</span>
-            <span class="value">Carmona, Cavite</span>
+            <!-- Project 2 -->
+            <a href="https://akikoooa.github.io/Modern-Kusina/mainwebsite.html" class="work-item" target="_blank">
+                <img src="Screenshot 2026-02-27 154820.png" alt="Modern Kusina Web">
+                <div class="work-overlay">
+                    
+                    <h4>Modern Kusina<span>_</span></h4>
+                </div>
+            </a>
         </div>
-
-       
-    </main>
+    </section>
 
 </body>
 </html>
