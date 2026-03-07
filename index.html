@@ -20,8 +20,6 @@
             overflow-x: hidden;
         }
 
-        
-
         nav {
             display: flex;
             justify-content: space-between;
@@ -31,8 +29,6 @@
             width: 100%;
             z-index: 10;
         }
-
-
 
         .logo {
             font-size: 1.5rem;
@@ -49,8 +45,6 @@
             gap: 20px;
         }
 
-
-
         .nav-links a {
             text-decoration: none;
             color: #ddd;
@@ -61,9 +55,6 @@
         .nav-links a:hover, .nav-links a.active {
             color: #fff;
         }
-
-
-
 
         .nav-links .active-pill {
             background: #8a2be2;
@@ -190,11 +181,6 @@
             gap: 4px;
         }
 
-
-
-
-
-        
         .work-overlay h4 {
             font-size: 1.25rem;
             color: #fff;
@@ -206,12 +192,53 @@
             color: #8a2be2;
         }
 
-        .work-overlay p {
-            font-size: 0.85rem;
+        .work-overlay p.category {
+            font-size: 0.75rem;
             color: #8a2be2;
             text-transform: uppercase;
-            font-weight: 500;
+            font-weight: 600;
             letter-spacing: 1px;
+            margin-bottom: -5px;
+        }
+
+        /* Styling for the new short description */
+        .work-overlay p.description {
+            font-size: 0.8rem;
+            color: #bbb;
+            font-weight: 400;
+            margin-top: 2px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: 0.4s 0.1s;
+        }
+
+        .work-item:hover .work-overlay p.description {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Updated Graphics Design Styling --- */
+        .collections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            max-width: 1100px;
+        }
+
+        .design-card {
+            aspect-ratio: 3/4 !important; /* Portrait ratio for posts/posters */
+            border: 2px solid #1a1a1a !important;
+        }
+
+        .design-card img {
+            object-fit: cover !important; /* Forces image to fill the card */
+            padding: 0 !important; /* Full-bleed image */
+            opacity: 0.85 !important;
+        }
+
+        .design-card:hover {
+            border-color: #8a2be2 !important;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.4) !important; /* Purple neon glow */
         }
 
         .social-sidebar {
@@ -244,6 +271,7 @@
             .hero-image { position: relative; width: 100%; height: 400px; right: 0; margin-top: 30px; }
             .social-sidebar { flex-direction: row; position: relative; top: 0; right: 0; transform: none; justify-content: center; margin: 40px 0; }
             .work-grid { grid-template-columns: 1fr; }
+            .collections-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
         }
     </style>
 </head>
@@ -252,9 +280,10 @@
     <nav>
         <div class="logo">Portfolio<span>.</span></div>
         <ul class="nav-links">
-            <li><a href="#" class="active-pill">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Skills</a></li>
+            <li><a href="index.html" class="active-pill">About</a></li>
+            <li><a href="quiz.html">Quiz</a></li>
+            <li><a href="activities.html">Activities</a></li>
+            <li><a href="exam.html">Exams</a></li>
             <li><a href="https://www.facebook.com/skatiiz">Contact</a></li>
         </ul>
     </nav>
@@ -276,7 +305,6 @@
         </div>
     </section>
 
-    <!-- Past Work Section -->
     <section class="portfolio-section">
         <div class="section-title">
             <h2>Recent <span>Projects</span></h2>
@@ -284,21 +312,62 @@
         </div>
 
         <div class="work-grid">
-            <!-- Project 1 -->
             <a href="https://d-bayong-art.github.io/D-Bayong-Arttt/" class="work-item" target="_blank">
                 <img src="Screenshot 2026-02-27 154741.png" alt="D-Bayong Poster">
                 <div class="work-overlay">
-                    
                     <h4>D-Bayong<span>_</span></h4>
                 </div>
             </a>
 
-            <!-- Project 2 -->
             <a href="https://akikoooa.github.io/Modern-Kusina/mainwebsite.html" class="work-item" target="_blank">
                 <img src="Screenshot 2026-02-27 154820.png" alt="Modern Kusina Web">
                 <div class="work-overlay">
-                    
                     <h4>Modern Kusina<span>_</span></h4>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <section class="portfolio-section" style="background-color: #000; border-top: 1px solid #111;">
+        <div class="section-title">
+            <h2>Digital <span>Collections</span></h2>
+            <p style="color: #666; font-size: 0.9rem;">Showcasing my graphic design and social media posts</p>
+        </div>
+
+        <div class="collections-grid">
+            <a href="https://www.facebook.com/photo?fbid=909466781939784&set=a.323255980560870" class="work-item design-card" target="_blank">
+                <img src="pos1.jpg" alt="Collection 1">
+                <div class="work-overlay">
+                    <p class="category">Poster Design</p>
+                    <h4>Visual Concept<span>_</span></h4>
+                    <p class="description">𝙏𝙝𝙚 𝙈𝙇𝘽𝘽 𝙏𝙧𝙮𝙤𝙪𝙩𝙨 𝙖𝙧𝙚 𝙣𝙤𝙬 𝙊𝙋𝙀𝙉.</p>
+                </div>
+            </a>
+
+            <a href="https://www.facebook.com/photo?fbid=901396946080101&set=a.105446262341844" class="work-item design-card" target="_blank">
+                <img src="pos2.jpg" alt="Collection 2">
+                <div class="work-overlay">
+                    <p class="category">Social Media</p>
+                    <h4>Graphic Layout<span>_</span></h4>
+                    <p class="description">𝙋𝙐𝘾𝙃𝙐! 𝙑𝙖𝙡𝙚𝙣𝙩𝙞𝙣𝙚’𝙨 𝙣𝙖 𝙣𝙖𝙢𝙖𝙣… 𝙡𝙪𝙜𝙚 𝙠𝙖𝙢𝙞𝙣𝙜 𝙢𝙜𝙖 𝙨𝙞𝙣𝙜𝙡𝙚! </p>
+                </div>
+            </a>
+
+            <a href="https://www.facebook.com/photo?fbid=892058727013923&set=a.105446262341844" class="work-item design-card" target="_blank">
+                <img src="pos3.jpg" alt="Collection 3">
+                <div class="work-overlay">
+                    <p class="category">Multimedia</p>
+                    <h4>Creative Art<span>_</span></h4>
+                    <p class="description">𝗡𝗲𝘄 𝗦𝗲𝗺𝗲𝘀𝘁𝗲𝗿, 𝗦𝗮𝗺𝗲 𝗚𝗼𝗮𝗹!</p>
+                </div>
+            </a>
+
+             <a href="https://www.facebook.com/photo/?fbid=848398151379981&set=pcb.848406518045811" class="work-item design-card" target="_blank">
+                <img src="pos4.jpg" alt="Collection 4">
+                <div class="work-overlay">
+                    <p class="category">Multimedia</p>
+                    <h4>Creative Art<span>_</span></h4>
+                    <p class="description">🎄 𝗖𝘃𝗦𝗨 𝗦𝗶𝗹𝗮𝗻𝗴 𝗖𝗵𝗿𝗶𝘀𝘁𝗺𝗮𝘀 𝗧𝗿𝗲𝗲 𝗟𝗶𝗴𝗵𝘁𝗶𝗻𝗴 𝟮𝟬𝟮𝟱 ✨</p>
                 </div>
             </a>
         </div>
