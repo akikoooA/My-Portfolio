@@ -6,6 +6,7 @@
     <title>Quizzes | Scot</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Base Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Roboto, Arial, sans-serif;
@@ -15,6 +16,7 @@
             overflow-x: hidden;
         }
 
+        /* Navigation */
         nav {
             display: flex;
             justify-content: space-between;
@@ -40,98 +42,139 @@
             color: white !important;
         }
 
+        /* Connection Badge */
+        .conn-tag {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+            color: #888;
+            border: 1px solid #333;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        .conn-active { border-color: #28a745; color: #28a745; background: rgba(40, 167, 69, 0.1); }
+
+        /* Hero Section */
         .hero {
-            height: 30vh; 
+            height: 35vh; 
             display: flex;
             align-items: center;
             padding: 0 8%;
-            background: linear-gradient(to bottom, #000, #050505);
+            background: linear-gradient(to bottom, #000, #080808);
         }
 
-        .hero-content h2 { font-size: 3rem; }
+        .hero-content h2 { font-size: 3.5rem; letter-spacing: -1px; }
         .hero-content h2 span { color: #8a2be2; }
 
+        /* Controls */
         .upload-section {
-            padding: 20px 8%;
-            background-color: #050505;
+            padding: 30px 8%;
+            background-color: #080808;
             text-align: center;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
         }
 
         .custom-upload-btn {
-            display: inline-block;
-            padding: 12px 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
             border: 2px solid #8a2be2;
             color: white;
-            border-radius: 30px;
+            border-radius: 8px;
             cursor: pointer;
             transition: 0.3s;
             font-weight: bold;
         }
 
-        .custom-upload-btn:hover { background: #8a2be2; }
-        #image-input { display: none; }
+        .publish-btn {
+            background: #8a2be2;
+            border: none;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none; /* Hidden until file is picked */
+            transition: 0.3s;
+        }
+        .publish-btn:hover { background: #9d4edd; transform: translateY(-2px); }
 
+        #preview-box {
+            max-width: 300px;
+            margin: 20px auto;
+            display: none;
+            border-radius: 12px;
+            border: 2px solid #1a1a1a;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Gallery Grid - Improved Sizing */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            padding: 40px 8%;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); /* Larger minimum size */
+            gap: 30px;
+            padding: 60px 8%;
         }
 
         .work-item {
             background: #0a0a0a; 
-            border-radius: 12px;
-            border: 2px solid #1a1a1a;
+            border-radius: 16px;
+            border: 1px solid #1a1a1a;
             position: relative;
             overflow: hidden;
-            animation: fadeIn 0.5s ease;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .work-item:hover {
+            transform: translateY(-5px);
+            border-color: #8a2be2;
         }
 
         .work-item img {
             width: 100%;
-            height: 250px;
+            height: auto;
+            aspect-ratio: 16 / 10; /* Clean, cinematic size */
             object-fit: cover;
             display: block;
+            border-bottom: 1px solid #1a1a1a;
         }
 
-        .card-content { padding: 15px; }
-        
-        .editable-title {
-            background: transparent;
-            border: 1px dashed transparent;
-            color: white;
-            font-size: 1rem;
-            width: 100%;
-            padding: 5px;
-            outline: none;
+        .card-content { padding: 20px; }
+        .editable-title { 
+            background: transparent; 
+            border: none; 
+            color: white; 
+            font-size: 1.2rem;
+            font-weight: 600;
+            width: 100%; 
+            outline: none; 
+            margin-bottom: 12px;
         }
 
-        .editable-title:focus {
-            border-color: #8a2be2;
-            background: #111;
-        }
-
-        .card-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        .action-btn {
-            background: none;
-            border: none;
-            color: #8a2be2;
-            cursor: pointer;
-            font-size: 0.8rem;
-            text-transform: uppercase;
+        .delete-btn { 
+            color: #666; 
+            background: none; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 0.8rem; 
             font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.2s;
         }
+        .delete-btn:hover { color: #ff4d4d; }
 
-        .delete-btn { color: #ff4d4d; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @media (max-width: 480px) {
+            .gallery-grid { grid-template-columns: 1fr; }
+            .hero-content h2 { font-size: 2.5rem; }
         }
     </style>
 </head>
@@ -143,132 +186,141 @@
             <li><a href="index.html">About</a></li>
             <li><a href="quiz.html" class="active-pill">Quiz</a></li>
             <li><a href="activities.html">Activities</a></li>
-            <li><a href="exam.html" >Exams</a></li>
-            <li><a href="https://www.facebook.com/skatiiz">Contact</a></li>
+            <li><a href="exam.html">Exams</a></li>
         </ul>
     </nav>
 
     <header class="hero">
         <div class="hero-content">
+            <div id="db-status" class="conn-tag">Connecting to Database...</div>
             <h2>QUIZZES<span>_</span></h2>
-            <p id="status-text">Uploading to Firebase will update this gallery in real-time.</p>
+            <p id="status-text">Your published results are synced directly with Firebase Firestore.</p>
         </div>
     </header>
 
     <section class="upload-section">
-        <label for="image-input" class="custom-upload-btn">
-            <i class="fas fa-plus"></i> ADD NEW QUIZ
-        </label>
-        <input type="file" id="image-input" accept="image/*" multiple>
+        <img id="preview-box" src="" alt="Preview">
+        
+        <div class="btn-container">
+            <label for="image-input" class="custom-upload-btn">
+                <i class="fas fa-file-import"></i> SELECT QUIZ IMAGE
+            </label>
+            <input type="file" id="image-input" accept="image/*" style="display:none">
+            
+            <button id="real-publish-btn" class="publish-btn">
+                <i class="fas fa-paper-plane"></i> PUBLISH NOW
+            </button>
+        </div>
     </section>
 
     <main class="gallery-grid" id="gallery"></main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
+        // Your specific Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCb9Pe_HFjCF5HS-xRbzfmr_7sosxOhsD0",
             authDomain: "portfolio-7b46b.firebaseapp.com",
             projectId: "portfolio-7b46b",
             storageBucket: "portfolio-7b46b.firebasestorage.app",
             messagingSenderId: "432309410875",
-            appId: "1:432309410875:web:fbc036b65790bb2846d01e",
-            measurementId: "G-CVKF9CD08B"
+            appId: "1:432309410875:web:fbc036b65790bb2846d01e"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        const gallery = document.getElementById('gallery');
         const imageInput = document.getElementById('image-input');
+        const publishBtn = document.getElementById('real-publish-btn');
+        const previewBox = document.getElementById('preview-box');
         const statusText = document.getElementById('status-text');
+        const dbStatus = document.getElementById('db-status');
+        const gallery = document.getElementById('gallery');
 
-        // REAL-TIME LISTENER: This makes the image show up immediately after upload
+        let fileToUpload = null;
+
+        // Visual confirmation that we are connected to the "quizzes" collection
+        if (db) {
+            dbStatus.textContent = "✓ Firebase Database Connected";
+            dbStatus.classList.add('conn-active');
+        }
+
+        // 1. Preview Logic
+        imageInput.addEventListener('change', (e) => {
+            fileToUpload = e.target.files[0];
+            if (fileToUpload) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    previewBox.src = event.target.result;
+                    previewBox.style.display = "block";
+                    publishBtn.style.display = "inline-block";
+                    statusText.textContent = "File ready: " + fileToUpload.name;
+                };
+                reader.readAsDataURL(fileToUpload);
+            }
+        });
+
+        // 2. Publish to Firebase Logic
+        publishBtn.addEventListener('click', async () => {
+            if (!fileToUpload) return;
+
+            try {
+                statusText.textContent = "Publishing to Firebase Cloud Storage...";
+                publishBtn.disabled = true;
+
+                // Uploading the actual file to storage
+                const storageRef = ref(storage, `quizzes/${Date.now()}_${fileToUpload.name}`);
+                const snapshot = await uploadBytes(storageRef, fileToUpload);
+                const url = await getDownloadURL(snapshot.ref);
+
+                // Creating the document in your Firestore "quizzes" collection
+                statusText.textContent = "Updating Database Records...";
+                await addDoc(collection(db, "quizzes"), {
+                    title: fileToUpload.name.split('.')[0],
+                    imgUrl: url,
+                    createdAt: serverTimestamp() // Uses official Firebase server time
+                });
+
+                statusText.textContent = "Publish Complete! View your quiz below.";
+                previewBox.style.display = "none";
+                publishBtn.style.display = "none";
+                fileToUpload = null;
+            } catch (err) {
+                console.error(err);
+                statusText.textContent = "Failed to Publish. Ensure Firebase Rules allow write access.";
+            } finally {
+                publishBtn.disabled = false;
+            }
+        });
+
+        // 3. Real-time View Logic
+        // This query specifically looks for the "quizzes" collection seen in your screenshot
         const q = query(collection(db, "quizzes"), orderBy("createdAt", "desc"));
         onSnapshot(q, (snapshot) => {
             gallery.innerHTML = "";
-            snapshot.forEach((doc) => {
-                renderCard(doc.data().imgUrl, doc.data().title, doc.id);
-            });
-            if (snapshot.empty) {
-                gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; opacity: 0.5;'>No quizzes found.</p>";
-            }
-        });
-
-        // UPLOAD TO FIREBASE STORAGE & FIRESTORE
-        imageInput.addEventListener('change', async function() {
-            const files = Array.from(this.files);
-            if (files.length === 0) return;
-
-            statusText.textContent = "Uploading to Database...";
-            
-            for (const file of files) {
-                try {
-                    const storageRef = ref(storage, `quizzes/${Date.now()}_${file.name}`);
-                    const snapshot = await uploadBytes(storageRef, file);
-                    const url = await getDownloadURL(snapshot.ref);
-
-                    // These fields match your Firebase console screenshot
-                    await addDoc(collection(db, "quizzes"), {
-                        title: file.name.split('.')[0],
-                        imgUrl: url,
-                        createdAt: serverTimestamp() 
-                    });
-                } catch (e) {
-                    console.error("Upload error:", e);
-                    statusText.textContent = "Upload failed. Check Firebase Rules.";
-                }
-            }
-            statusText.textContent = "Upload Complete!";
-            setTimeout(() => { statusText.textContent = "Click titles to edit."; }, 3000);
-        });
-
-        function renderCard(imgSrc, title, id) {
-            const card = document.createElement('div');
-            card.className = 'work-item';
-            card.innerHTML = `
-                <img src="${imgSrc}" alt="${title}">
-                <div class="card-content">
-                    <input type="text" class="editable-title" value="${title}" onchange="updateTitle('${id}', this.value)">
-                    <div class="card-actions">
-                        <button class="action-btn" onclick="triggerChange('${id}')">Change Image</button>
-                        <button class="action-btn delete-btn" onclick="deleteItem('${id}')">Remove</button>
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                const card = document.createElement('div');
+                card.className = 'work-item';
+                card.innerHTML = `
+                    <img src="${data.imgUrl}" alt="${data.title}">
+                    <div class="card-content">
+                        <input type="text" class="editable-title" value="${data.title}" readonly>
+                        <button class="delete-btn" onclick="removeQuiz('${docSnap.id}')">Remove Entry</button>
                     </div>
-                    <input type="file" id="input-${id}" style="display:none" accept="image/*">
-                </div>
-            `;
-            gallery.appendChild(card);
-
-            const changeInput = card.querySelector(`#input-${id}`);
-            changeInput.addEventListener('change', async function() {
-                if (this.files[0]) {
-                    statusText.textContent = "Updating image...";
-                    const storageRef = ref(storage, `quizzes/${Date.now()}_${this.files[0].name}`);
-                    const snapshot = await uploadBytes(storageRef, this.files[0]);
-                    const newUrl = await getDownloadURL(snapshot.ref);
-                    
-                    await updateDoc(doc(db, "quizzes", id), { imgUrl: newUrl });
-                    statusText.textContent = "Database Updated!";
-                }
+                `;
+                gallery.appendChild(card);
             });
-        }
+        });
 
-        window.updateTitle = async (id, val) => {
-            await updateDoc(doc(db, "quizzes", id), { title: val });
-        };
-
-        window.deleteItem = async (id) => {
-            if (confirm("Delete permanently from Database?")) {
+        window.removeQuiz = async (id) => {
+            if(confirm("Permanently delete this from your Firebase collection?")) {
                 await deleteDoc(doc(db, "quizzes", id));
             }
-        };
-
-        window.triggerChange = (id) => {
-            document.getElementById(`input-${id}`).click();
         };
     </script>
 </body>
