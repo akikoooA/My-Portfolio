@@ -199,93 +199,107 @@
     <main class="gallery-grid" id="gallery-root"></main>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCb9Pe_HFjCF5HS-xRbzfmr_7sosxOhsD0",
-            authDomain: "portfolio-7b46b.firebaseapp.com",
-            projectId: "portfolio-7b46b",
-            storageBucket: "portfolio-7b46b.firebasestorage.app",
-            appId: "1:432309410875:web:fbc036b65790bb2846d01e"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyCb9Pe_HFjCF5HS-xRbzfmr_7sosxOhsD0",
+        authDomain: "portfolio-7b46b.firebaseapp.com",
+        projectId: "portfolio-7b46b",
+        storageBucket: "portfolio-7b46b.firebasestorage.app",
+        appId: "1:432309410875:web:fbc036b65790bb2846d01e"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
-        const imgInput = document.getElementById('image-input');
-        const pubBtn = document.getElementById('real-publish-btn');
-        const preview = document.getElementById('preview-box');
-        const gallery = document.getElementById('gallery-root');
-        const dbStatus = document.getElementById('db-status');
-        const statusText = document.getElementById('status-text');
+    const imgInput = document.getElementById('image-input');
+    const pubBtn = document.getElementById('real-publish-btn');
+    const preview = document.getElementById('preview-box');
+    const gallery = document.getElementById('gallery-root');
+    const dbStatus = document.getElementById('db-status');
+    const statusText = document.getElementById('status-text');
 
-        if (db) {
-            dbStatus.textContent = "Database Connected ✓";
-            dbStatus.classList.add('conn-active');
+    if (db) {
+        dbStatus.textContent = "Database Connected ✓";
+        dbStatus.classList.add('conn-active');
+    }
+
+    let selectedFile = null;
+
+    imgInput.addEventListener('change', (e) => {
+        selectedFile = e.target.files[0];
+        if (selectedFile) {
+            preview.src = URL.createObjectURL(selectedFile);
+            preview.style.display = "block";
+            pubBtn.style.display = "inline-block";
+            statusText.textContent = "Image ready to publish.";
         }
+    });
 
-        let selectedFile = null;
+    pubBtn.addEventListener('click', async () => {
+        if (!selectedFile) return;
+        pubBtn.disabled = true;
+        statusText.textContent = "Publishing to cloud...";
 
-        imgInput.addEventListener('change', (e) => {
-            selectedFile = e.target.files[0];
-            if (selectedFile) {
-                preview.src = URL.createObjectURL(selectedFile);
-                preview.style.display = "block";
-                pubBtn.style.display = "inline-block";
-                statusText.textContent = "Image ready to publish.";
-            }
-        });
+        try {
+            const storageRef = ref(storage, `quizzes/${Date.now()}_${selectedFile.name}`);
+            const snapshot = await uploadBytes(storageRef, selectedFile);
+            const url = await getDownloadURL(snapshot.ref);
 
-        pubBtn.addEventListener('click', async () => {
-            if (!selectedFile) return;
-            pubBtn.disabled = true;
-            statusText.textContent = "Publishing to cloud...";
+            // Added log to help you debug in the browser console
+            console.log("File uploaded. URL:", url);
 
-            try {
-                const storageRef = ref(storage, `quizzes/${Date.now()}_${selectedFile.name}`);
-                const snapshot = await uploadBytes(storageRef, selectedFile);
-                const url = await getDownloadURL(snapshot.ref);
-
-                // This section now matches your screenshot fields exactly
-                await addDoc(collection(db, "quizzes"), {
-                    title: selectedFile.name.split('.')[0],
-                    imgUrl: url,
-                    createdAt: serverTimestamp()
-                });
-
-                preview.style.display = "none";
-                pubBtn.style.display = "none";
-                selectedFile = null;
-                statusText.textContent = "Successfully published!";
-            } catch (err) {
-                console.error(err);
-                statusText.textContent = "Error! Check Firebase rules.";
-            } finally {
-                pubBtn.disabled = false;
-            }
-        });
-
-        const q = query(collection(db, "quizzes"), orderBy("createdAt", "desc"));
-        onSnapshot(q, (snapshot) => {
-            gallery.innerHTML = "";
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                if (!data.imgUrl) return;
-
-                const item = document.createElement('div');
-                item.className = 'work-item';
-                item.innerHTML = `
-                    <img src="${data.imgUrl}" alt="Quiz Screenshot">
-                    <div class="card-content">
-                        <b class="editable-title">${data.title || 'Untitled Quiz'}</b>
-                    </div>
-                `;
-                gallery.appendChild(item);
+            await addDoc(collection(db, "quizzes"), {
+                title: selectedFile.name.split('.')[0],
+                imgUrl: url,
+                createdAt: serverTimestamp()
             });
+
+            preview.style.display = "none";
+            pubBtn.style.display = "none";
+            selectedFile = null;
+            statusText.textContent = "Successfully published!";
+        } catch (err) {
+            console.error("Upload Error:", err);
+            statusText.textContent = "Error! Check Firebase rules.";
+        } finally {
+            pubBtn.disabled = false;
+        }
+    });
+
+    // UPDATED DISPLAY LOGIC
+    const q = query(collection(db, "quizzes"), orderBy("createdAt", "desc"));
+    onSnapshot(q, (snapshot) => {
+        gallery.innerHTML = "";
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            
+            // Log the data to the console so you can see if imgUrl is actually there
+            console.log("Firestore Doc Data:", data);
+
+            const item = document.createElement('div');
+            item.className = 'work-item';
+            
+            // If imgUrl is missing in the database, it shows a placeholder so you know the doc exists
+            const displayImg = data.imgUrl || "https://via.placeholder.com/400x250?text=No+Image+Found";
+            const displayTitle = data.title || "Untitled Quiz";
+
+            item.innerHTML = `
+                <img src="${displayImg}" alt="Quiz Screenshot" onerror="this.src='https://via.placeholder.com/400x250?text=Error+Loading+Image'">
+                <div class="card-content">
+                    <b class="editable-title">${displayTitle}</b>
+                </div>
+            `;
+            gallery.appendChild(item);
         });
+    }, (error) => {
+        console.error("Snapshot error:", error);
+        statusText.textContent = "Failed to load gallery.";
+    });
+</script>
     </script>
 </body>
 </html>
