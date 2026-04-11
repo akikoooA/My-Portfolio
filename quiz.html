@@ -103,7 +103,7 @@
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
-            display: none; /* Hidden until file is picked */
+            display: none; 
             transition: 0.3s;
         }
         .publish-btn:hover { background: #9d4edd; transform: translateY(-2px); }
@@ -117,10 +117,10 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        /* Gallery Grid - Improved Sizing */
+        /* Gallery Grid */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); /* Larger minimum size */
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 30px;
             padding: 60px 8%;
         }
@@ -141,36 +141,18 @@
         .work-item img {
             width: 100%;
             height: auto;
-            aspect-ratio: 16 / 10; /* Clean, cinematic size */
+            aspect-ratio: 16 / 10;
             object-fit: cover;
             display: block;
             border-bottom: 1px solid #1a1a1a;
         }
 
-        .card-content { padding: 20px; }
+        .card-content { padding: 20px; text-align: center; }
         .editable-title { 
-            background: transparent; 
-            border: none; 
             color: white; 
             font-size: 1.2rem;
             font-weight: 600;
-            width: 100%; 
-            outline: none; 
-            margin-bottom: 12px;
         }
-
-        .delete-btn { 
-            color: #666; 
-            background: none; 
-            border: none; 
-            cursor: pointer; 
-            font-size: 0.8rem; 
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: 0.2s;
-        }
-        .delete-btn:hover { color: #ff4d4d; }
 
         @media (max-width: 480px) {
             .gallery-grid { grid-template-columns: 1fr; }
@@ -187,6 +169,7 @@
             <li><a href="quiz.html" class="active-pill">Quiz</a></li>
             <li><a href="activities.html">Activities</a></li>
             <li><a href="exam.html">Exams</a></li>
+            <li><a href="https://www.facebook.com/skatiiz">Contact</a></li>
         </ul>
     </nav>
 
@@ -213,20 +196,18 @@
         </div>
     </section>
 
-    <main class="gallery-grid" id="gallery"></main>
+    <main class="gallery-grid" id="gallery-root"></main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-        // Your specific Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCb9Pe_HFjCF5HS-xRbzfmr_7sosxOhsD0",
             authDomain: "portfolio-7b46b.firebaseapp.com",
             projectId: "portfolio-7b46b",
             storageBucket: "portfolio-7b46b.firebasestorage.app",
-            messagingSenderId: "432309410875",
             appId: "1:432309410875:web:fbc036b65790bb2846d01e"
         };
 
@@ -234,94 +215,77 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        const imageInput = document.getElementById('image-input');
-        const publishBtn = document.getElementById('real-publish-btn');
-        const previewBox = document.getElementById('preview-box');
-        const statusText = document.getElementById('status-text');
+        const imgInput = document.getElementById('image-input');
+        const pubBtn = document.getElementById('real-publish-btn');
+        const preview = document.getElementById('preview-box');
+        const gallery = document.getElementById('gallery-root');
         const dbStatus = document.getElementById('db-status');
-        const gallery = document.getElementById('gallery');
+        const statusText = document.getElementById('status-text');
 
-        let fileToUpload = null;
-
-        // Visual confirmation that we are connected to the "quizzes" collection
         if (db) {
-            dbStatus.textContent = "✓ Firebase Database Connected";
+            dbStatus.textContent = "Database Connected ✓";
             dbStatus.classList.add('conn-active');
         }
 
-        // 1. Preview Logic
-        imageInput.addEventListener('change', (e) => {
-            fileToUpload = e.target.files[0];
-            if (fileToUpload) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    previewBox.src = event.target.result;
-                    previewBox.style.display = "block";
-                    publishBtn.style.display = "inline-block";
-                    statusText.textContent = "File ready: " + fileToUpload.name;
-                };
-                reader.readAsDataURL(fileToUpload);
+        let selectedFile = null;
+
+        imgInput.addEventListener('change', (e) => {
+            selectedFile = e.target.files[0];
+            if (selectedFile) {
+                preview.src = URL.createObjectURL(selectedFile);
+                preview.style.display = "block";
+                pubBtn.style.display = "inline-block";
+                statusText.textContent = "Image ready to publish.";
             }
         });
 
-        // 2. Publish to Firebase Logic
-        publishBtn.addEventListener('click', async () => {
-            if (!fileToUpload) return;
+        pubBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+            pubBtn.disabled = true;
+            statusText.textContent = "Publishing to cloud...";
 
             try {
-                statusText.textContent = "Publishing to Firebase Cloud Storage...";
-                publishBtn.disabled = true;
-
-                // Uploading the actual file to storage
-                const storageRef = ref(storage, `quizzes/${Date.now()}_${fileToUpload.name}`);
-                const snapshot = await uploadBytes(storageRef, fileToUpload);
+                const storageRef = ref(storage, `quizzes/${Date.now()}_${selectedFile.name}`);
+                const snapshot = await uploadBytes(storageRef, selectedFile);
                 const url = await getDownloadURL(snapshot.ref);
 
-                // Creating the document in your Firestore "quizzes" collection
-                statusText.textContent = "Updating Database Records...";
+                // This section now matches your screenshot fields exactly
                 await addDoc(collection(db, "quizzes"), {
-                    title: fileToUpload.name.split('.')[0],
+                    title: selectedFile.name.split('.')[0],
                     imgUrl: url,
-                    createdAt: serverTimestamp() // Uses official Firebase server time
+                    createdAt: serverTimestamp()
                 });
 
-                statusText.textContent = "Publish Complete! View your quiz below.";
-                previewBox.style.display = "none";
-                publishBtn.style.display = "none";
-                fileToUpload = null;
+                preview.style.display = "none";
+                pubBtn.style.display = "none";
+                selectedFile = null;
+                statusText.textContent = "Successfully published!";
             } catch (err) {
                 console.error(err);
-                statusText.textContent = "Failed to Publish. Ensure Firebase Rules allow write access.";
+                statusText.textContent = "Error! Check Firebase rules.";
             } finally {
-                publishBtn.disabled = false;
+                pubBtn.disabled = false;
             }
         });
 
-        // 3. Real-time View Logic
-        // This query specifically looks for the "quizzes" collection seen in your screenshot
         const q = query(collection(db, "quizzes"), orderBy("createdAt", "desc"));
         onSnapshot(q, (snapshot) => {
             gallery.innerHTML = "";
-            snapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                const card = document.createElement('div');
-                card.className = 'work-item';
-                card.innerHTML = `
-                    <img src="${data.imgUrl}" alt="${data.title}">
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                if (!data.imgUrl) return;
+
+                const item = document.createElement('div');
+                item.className = 'work-item';
+                item.innerHTML = `
+                    <img src="${data.imgUrl}" alt="Quiz Screenshot">
                     <div class="card-content">
-                        <input type="text" class="editable-title" value="${data.title}" readonly>
-                        <button class="delete-btn" onclick="removeQuiz('${docSnap.id}')">Remove Entry</button>
+                        <b class="editable-title">${data.title || 'Untitled Quiz'}</b>
                     </div>
                 `;
-                gallery.appendChild(card);
+                gallery.appendChild(item);
             });
         });
-
-        window.removeQuiz = async (id) => {
-            if(confirm("Permanently delete this from your Firebase collection?")) {
-                await deleteDoc(doc(db, "quizzes", id));
-            }
-        };
     </script>
 </body>
 </html>
