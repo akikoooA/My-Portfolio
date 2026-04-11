@@ -262,9 +262,13 @@ pubBtn.addEventListener('click', async () => {
             createdAt: new Date()
         });
 
-        preview.style.display = "none";
-        pubBtn.style.display = "none";
-        selectedFile = null;
+      // keep preview visible after upload
+preview.src = url; // show uploaded image from Firebase
+statusText.textContent = "Successfully published!";
+
+// optional: reset button but keep image
+pubBtn.style.display = "none";
+selectedFile = null;
         statusText.textContent = "Successfully published!";
 
     } catch (err) {
