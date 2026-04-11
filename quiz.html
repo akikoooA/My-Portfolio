@@ -6,7 +6,6 @@
     <title>Quizzes | Scot</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Base Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Roboto, Arial, sans-serif;
@@ -16,13 +15,12 @@
             overflow-x: hidden;
         }
 
-        /* Navigation - Fixed visibility */
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 2rem 5%;
-            background-color: #000000; /* Solid background so it's visible */
+            background-color: #000000;
             position: relative; 
             width: 100%;
             z-index: 1000;
@@ -42,7 +40,6 @@
             color: white !important;
         }
 
-        /* Hero Section */
         .hero {
             height: 30vh; 
             display: flex;
@@ -54,7 +51,6 @@
         .hero-content h2 { font-size: 3rem; }
         .hero-content h2 span { color: #8a2be2; }
 
-        /* Controls */
         .upload-section {
             padding: 20px 8%;
             background-color: #050505;
@@ -75,7 +71,6 @@
         .custom-upload-btn:hover { background: #8a2be2; }
         #image-input { display: none; }
 
-        /* Gallery Grid */
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -156,7 +151,7 @@
     <header class="hero">
         <div class="hero-content">
             <h2>QUIZZES<span>_</span></h2>
-            <p id="status-text">Click titles to edit. Changes save automatically.</p>
+            <p id="status-text">Uploading to Firebase will update this gallery in real-time.</p>
         </div>
     </header>
 
@@ -171,10 +166,9 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCb9Pe_HFjCF5HS-xRbzfmr_7sosxOhsD0",
             authDomain: "portfolio-7b46b.firebaseapp.com",
@@ -193,34 +187,24 @@
         const imageInput = document.getElementById('image-input');
         const statusText = document.getElementById('status-text');
 
-        // Load Data
-        async function loadQuizzes() {
-            gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; opacity: 0.5;'>Fetching data...</p>";
-            try {
-                const q = query(collection(db, "quizzes"), orderBy("createdAt", "desc"));
-                const querySnapshot = await getDocs(q);
-                gallery.innerHTML = "";
-                
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    renderCard(data.imgUrl, data.title, doc.id);
-                });
-
-                if (querySnapshot.empty) {
-                    gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; opacity: 0.5;'>Gallery is empty.</p>";
-                }
-            } catch (err) {
-                console.error(err);
-                statusText.textContent = "Error loading. Check Console.";
+        // REAL-TIME LISTENER: This makes the image show up immediately after upload
+        const q = query(collection(db, "quizzes"), orderBy("createdAt", "desc"));
+        onSnapshot(q, (snapshot) => {
+            gallery.innerHTML = "";
+            snapshot.forEach((doc) => {
+                renderCard(doc.data().imgUrl, doc.data().title, doc.id);
+            });
+            if (snapshot.empty) {
+                gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; opacity: 0.5;'>No quizzes found.</p>";
             }
-        }
+        });
 
-        // Upload Logic
+        // UPLOAD TO FIREBASE STORAGE & FIRESTORE
         imageInput.addEventListener('change', async function() {
             const files = Array.from(this.files);
             if (files.length === 0) return;
 
-            statusText.textContent = "Uploading images...";
+            statusText.textContent = "Uploading to Database...";
             
             for (const file of files) {
                 try {
@@ -228,26 +212,26 @@
                     const snapshot = await uploadBytes(storageRef, file);
                     const url = await getDownloadURL(snapshot.ref);
 
+                    // These fields match your Firebase console screenshot
                     await addDoc(collection(db, "quizzes"), {
                         title: file.name.split('.')[0],
                         imgUrl: url,
-                        createdAt: new Date()
+                        createdAt: serverTimestamp() 
                     });
                 } catch (e) {
-                    console.error("Upload failed", e);
+                    console.error("Upload error:", e);
+                    statusText.textContent = "Upload failed. Check Firebase Rules.";
                 }
             }
-            statusText.textContent = "Done!";
+            statusText.textContent = "Upload Complete!";
             setTimeout(() => { statusText.textContent = "Click titles to edit."; }, 3000);
-            loadQuizzes();
         });
 
-        // UI Card Rendering
         function renderCard(imgSrc, title, id) {
             const card = document.createElement('div');
             card.className = 'work-item';
             card.innerHTML = `
-                <img src="${imgSrc}" loading="lazy">
+                <img src="${imgSrc}" alt="${title}">
                 <div class="card-content">
                     <input type="text" class="editable-title" value="${title}" onchange="updateTitle('${id}', this.value)">
                     <div class="card-actions">
@@ -259,39 +243,33 @@
             `;
             gallery.appendChild(card);
 
-            // Per-card change image handler
             const changeInput = card.querySelector(`#input-${id}`);
             changeInput.addEventListener('change', async function() {
                 if (this.files[0]) {
-                    statusText.textContent = "Replacing image...";
+                    statusText.textContent = "Updating image...";
                     const storageRef = ref(storage, `quizzes/${Date.now()}_${this.files[0].name}`);
                     const snapshot = await uploadBytes(storageRef, this.files[0]);
                     const newUrl = await getDownloadURL(snapshot.ref);
                     
                     await updateDoc(doc(db, "quizzes", id), { imgUrl: newUrl });
-                    loadQuizzes();
-                    statusText.textContent = "Updated!";
+                    statusText.textContent = "Database Updated!";
                 }
             });
         }
 
-        // Global functions for inline HTML events
         window.updateTitle = async (id, val) => {
             await updateDoc(doc(db, "quizzes", id), { title: val });
         };
 
         window.deleteItem = async (id) => {
-            if (confirm("Delete permanently?")) {
+            if (confirm("Delete permanently from Database?")) {
                 await deleteDoc(doc(db, "quizzes", id));
-                loadQuizzes();
             }
         };
 
         window.triggerChange = (id) => {
             document.getElementById(`input-${id}`).click();
         };
-
-        loadQuizzes();
     </script>
 </body>
 </html>
