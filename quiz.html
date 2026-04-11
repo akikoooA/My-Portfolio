@@ -6,112 +6,137 @@
     <title>Quizzes | Scot</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Base Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --accent: #8a2be2;
-            --bg-dark: #000000;
-            --bg-card: #0a0a0a;
-            --border: #1a1a1a;
-            --text-gray: #bbbbbb;
-        }
         body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg-dark);
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #000000;
             color: #ffffff;
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        /* Navigation */
+        /* Navigation - Fixed visibility */
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 2rem 8%;
-            position: sticky;
-            top: 0;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            z-index: 100;
-            border-bottom: 1px solid var(--border);
+            padding: 2rem 5%;
+            background-color: #000000; /* Solid background so it's visible */
+            position: relative; 
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid #1a1a1a;
         }
-        .logo { font-size: 1.8rem; font-weight: bold; }
-        .logo span { color: var(--accent); }
-        .nav-links { list-style: none; display: flex; gap: 30px; }
-        .nav-links a { text-decoration: none; color: #ddd; }
+
+        .logo { font-size: 1.5rem; font-weight: bold; }
+        .logo span { color: #8a2be2; }
+
+        .nav-links { list-style: none; display: flex; gap: 20px; }
+        .nav-links a { text-decoration: none; color: #ddd; font-size: 0.9rem; transition: 0.3s; }
+        
         .nav-links .active-pill {
-            background: var(--accent);
-            padding: 8px 20px;
-            border-radius: 50px;
+            background: #8a2be2;
+            padding: 5px 15px;
+            border-radius: 5px;
             color: white !important;
         }
 
-        /* Layout UI */
-        .hero { padding: 80px 8% 40px; max-width: 1400px; margin: 0 auto; }
-        .hero h2 { font-size: 5rem; font-weight: 800; }
-        .hero h2 span { color: var(--accent); }
-
-        .controls {
-            padding: 40px 8%;
+        /* Hero Section */
+        .hero {
+            height: 30vh; 
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 20px;
-            background: linear-gradient(to bottom, #050505, #000);
+            padding: 0 8%;
+            background: linear-gradient(to bottom, #000, #050505);
         }
 
-        .btn {
-            padding: 15px 35px;
-            border-radius: 50px;
-            font-weight: 700;
+        .hero-content h2 { font-size: 3rem; }
+        .hero-content h2 span { color: #8a2be2; }
+
+        /* Controls */
+        .upload-section {
+            padding: 20px 8%;
+            background-color: #050505;
+            text-align: center;
+        }
+
+        .custom-upload-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border: 2px solid #8a2be2;
+            color: white;
+            border-radius: 30px;
             cursor: pointer;
             transition: 0.3s;
-            text-transform: uppercase;
-            border: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-weight: bold;
         }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-outline { background: transparent; border: 2px solid var(--border); color: white; }
-        .btn-outline.active { border-color: var(--accent); color: var(--accent); }
 
-        /* Gallery */
-        .gallery-container { padding: 40px 8%; max-width: 1600px; margin: 0 auto; }
+        .custom-upload-btn:hover { background: #8a2be2; }
+        #image-input { display: none; }
+
+        /* Gallery Grid */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            gap: 50px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 40px 8%;
         }
 
-        .quiz-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
+        .work-item {
+            background: #0a0a0a; 
+            border-radius: 12px;
+            border: 2px solid #1a1a1a;
+            position: relative;
             overflow: hidden;
-            transition: 0.4s;
+            animation: fadeIn 0.5s ease;
         }
-        .img-box { width: 100%; height: 650px; background: #111; }
-        .img-box img { width: 100%; height: 100%; object-fit: contain; }
+
+        .work-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .card-content { padding: 15px; }
         
-        .card-info { padding: 30px; }
-        .card-title {
-            background: transparent; border: 1px solid transparent;
-            color: white; font-size: 1.5rem; font-weight: 700; width: 100%;
-            outline: none; padding: 5px;
+        .editable-title {
+            background: transparent;
+            border: 1px dashed transparent;
+            color: white;
+            font-size: 1rem;
+            width: 100%;
+            padding: 5px;
+            outline: none;
         }
 
-        /* Edit Mode Hide/Show */
-        .edit-ui { display: none; margin-top: 15px; gap: 10px; }
-        body.edit-mode .edit-ui { display: flex; }
-        body.edit-mode .card-title { border-color: #333; background: #111; }
+        .editable-title:focus {
+            border-color: #8a2be2;
+            background: #111;
+        }
 
-        .mini-btn { background: transparent; border: 1px solid var(--border); color: #fff; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
-        .btn-del { border-color: #ff4444; color: #ff4444; }
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
 
-        @media (max-width: 768px) {
-            .hero h2 { font-size: 3rem; }
-            .gallery-grid { grid-template-columns: 1fr; }
-            .img-box { height: 450px; }
+        .action-btn {
+            background: none;
+            border: none;
+            color: #8a2be2;
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .delete-btn { color: #ff4d4d; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -123,39 +148,33 @@
             <li><a href="index.html">About</a></li>
             <li><a href="quiz.html" class="active-pill">Quiz</a></li>
             <li><a href="activities.html">Activities</a></li>
+            <li><a href="exam.html" >Exams</a></li>
             <li><a href="https://www.facebook.com/skatiiz">Contact</a></li>
         </ul>
     </nav>
 
     <header class="hero">
-        <span style="color:var(--accent); font-weight: 800; letter-spacing: 3px;">DATABASE CONNECTED</span>
-        <h2>QUIZ RECORDS<span>_</span></h2>
-        <p>Real-time storage powered by Firebase.</p>
+        <div class="hero-content">
+            <h2>QUIZZES<span>_</span></h2>
+            <p id="status-text">Click titles to edit. Changes save automatically.</p>
+        </div>
     </header>
 
-    <section class="controls">
-        <div style="display: flex; gap: 15px;">
-            <button class="btn btn-primary" onclick="document.getElementById('file-in').click()">
-                <i class="fas fa-plus"></i> Upload New
-            </button>
-            <button class="btn btn-outline" id="toggle-edit">
-                <i class="fas fa-edit"></i> Manage Mode
-            </button>
-        </div>
-        <div id="status-msg" style="color: var(--text-gray);">Ready</div>
-        <input type="file" id="file-in" style="display:none" accept="image/*" multiple>
+    <section class="upload-section">
+        <label for="image-input" class="custom-upload-btn">
+            <i class="fas fa-plus"></i> ADD NEW QUIZ
+        </label>
+        <input type="file" id="image-input" accept="image/*" multiple>
     </section>
 
-    <main class="gallery-container">
-        <div class="gallery-grid" id="gallery"></div>
-    </main>
+    <main class="gallery-grid" id="gallery"></main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-        // Ang iyong Configuration
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCb9Pe_HFjCF5HS-xRbzfmr_7sosxOhsD0",
             authDomain: "portfolio-7b46b.firebaseapp.com",
@@ -171,90 +190,108 @@
         const storage = getStorage(app);
 
         const gallery = document.getElementById('gallery');
-        const fileIn = document.getElementById('file-in');
-        const statusMsg = document.getElementById('status-msg');
+        const imageInput = document.getElementById('image-input');
+        const statusText = document.getElementById('status-text');
 
-        // 1. Load data mula sa Firestore
-        async function loadData() {
-            gallery.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Loading quizzes...</p>';
+        // Load Data
+        async function loadQuizzes() {
+            gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; opacity: 0.5;'>Fetching data...</p>";
             try {
                 const q = query(collection(db, "quizzes"), orderBy("createdAt", "desc"));
                 const querySnapshot = await getDocs(q);
-                gallery.innerHTML = '';
+                gallery.innerHTML = "";
+                
                 querySnapshot.forEach((doc) => {
-                    renderCard(doc.data().imgUrl, doc.data().title, doc.id);
+                    const data = doc.data();
+                    renderCard(data.imgUrl, data.title, doc.id);
                 });
-            } catch (e) {
-                console.error("Error loading:", e);
-                statusMsg.textContent = "Error loading data.";
+
+                if (querySnapshot.empty) {
+                    gallery.innerHTML = "<p style='grid-column: 1/-1; text-align: center; opacity: 0.5;'>Gallery is empty.</p>";
+                }
+            } catch (err) {
+                console.error(err);
+                statusText.textContent = "Error loading. Check Console.";
             }
         }
 
-        // 2. Upload function
-        fileIn.addEventListener('change', async (e) => {
-            const files = Array.from(e.target.files);
+        // Upload Logic
+        imageInput.addEventListener('change', async function() {
+            const files = Array.from(this.files);
             if (files.length === 0) return;
 
-            statusMsg.textContent = `Uploading ${files.length} image(s)...`;
-
+            statusText.textContent = "Uploading images...";
+            
             for (const file of files) {
                 try {
-                    // Upload sa Storage
                     const storageRef = ref(storage, `quizzes/${Date.now()}_${file.name}`);
                     const snapshot = await uploadBytes(storageRef, file);
                     const url = await getDownloadURL(snapshot.ref);
 
-                    // Save sa Firestore
                     await addDoc(collection(db, "quizzes"), {
                         title: file.name.split('.')[0],
                         imgUrl: url,
                         createdAt: new Date()
                     });
-                } catch (err) {
-                    console.error("Upload error:", err);
+                } catch (e) {
+                    console.error("Upload failed", e);
                 }
             }
-            statusMsg.textContent = "Done!";
-            loadData();
+            statusText.textContent = "Done!";
+            setTimeout(() => { statusText.textContent = "Click titles to edit."; }, 3000);
+            loadQuizzes();
         });
 
-        // 3. UI Rendering
-        function renderCard(src, title, id) {
+        // UI Card Rendering
+        function renderCard(imgSrc, title, id) {
             const card = document.createElement('div');
-            card.className = 'quiz-card';
+            card.className = 'work-item';
             card.innerHTML = `
-                <div class="img-box"><img src="${src}"></div>
-                <div class="card-info">
-                    <span style="color:var(--accent); font-size:0.8rem; font-weight:800;">RECORD</span>
-                    <input type="text" class="card-title" value="${title}" readonly>
-                    <div class="edit-ui">
-                        <button class="mini-btn btn-del" onclick="window.deleteItem('${id}')">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
+                <img src="${imgSrc}" loading="lazy">
+                <div class="card-content">
+                    <input type="text" class="editable-title" value="${title}" onchange="updateTitle('${id}', this.value)">
+                    <div class="card-actions">
+                        <button class="action-btn" onclick="triggerChange('${id}')">Change Image</button>
+                        <button class="action-btn delete-btn" onclick="deleteItem('${id}')">Remove</button>
                     </div>
+                    <input type="file" id="input-${id}" style="display:none" accept="image/*">
                 </div>
             `;
             gallery.appendChild(card);
+
+            // Per-card change image handler
+            const changeInput = card.querySelector(`#input-${id}`);
+            changeInput.addEventListener('change', async function() {
+                if (this.files[0]) {
+                    statusText.textContent = "Replacing image...";
+                    const storageRef = ref(storage, `quizzes/${Date.now()}_${this.files[0].name}`);
+                    const snapshot = await uploadBytes(storageRef, this.files[0]);
+                    const newUrl = await getDownloadURL(snapshot.ref);
+                    
+                    await updateDoc(doc(db, "quizzes", id), { imgUrl: newUrl });
+                    loadQuizzes();
+                    statusText.textContent = "Updated!";
+                }
+            });
         }
 
-        // Delete function
+        // Global functions for inline HTML events
+        window.updateTitle = async (id, val) => {
+            await updateDoc(doc(db, "quizzes", id), { title: val });
+        };
+
         window.deleteItem = async (id) => {
-            if(confirm("Permanently delete this quiz?")) {
-                statusMsg.textContent = "Deleting...";
+            if (confirm("Delete permanently?")) {
                 await deleteDoc(doc(db, "quizzes", id));
-                statusMsg.textContent = "Deleted.";
-                loadData();
+                loadQuizzes();
             }
         };
 
-        // Manage Mode Toggle
-        document.getElementById('toggle-edit').addEventListener('click', function() {
-            document.body.classList.toggle('edit-mode');
-            this.classList.toggle('active');
-        });
+        window.triggerChange = (id) => {
+            document.getElementById(`input-${id}`).click();
+        };
 
-        // Initial Load
-        loadData();
+        loadQuizzes();
     </script>
 </body>
 </html>
