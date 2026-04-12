@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quizzes | Scot</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        /* Base Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Roboto, Arial, sans-serif;
@@ -15,34 +15,27 @@
             line-height: 1.6;
             overflow-x: hidden;
         }
-
-        /* Navigation */
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 2rem 5%;
             background-color: #000000;
-            position: relative; 
+            position: relative;
             width: 100%;
             z-index: 1000;
             border-bottom: 1px solid #1a1a1a;
         }
-
         .logo { font-size: 1.5rem; font-weight: bold; }
         .logo span { color: #8a2be2; }
-
         .nav-links { list-style: none; display: flex; gap: 20px; }
         .nav-links a { text-decoration: none; color: #ddd; font-size: 0.9rem; transition: 0.3s; }
-        
         .nav-links .active-pill {
             background: #8a2be2;
             padding: 5px 15px;
             border-radius: 5px;
             color: white !important;
         }
-
-        /* Connection Badge */
         .conn-tag {
             font-size: 0.75rem;
             padding: 4px 12px;
@@ -53,35 +46,29 @@
             margin-bottom: 15px;
             display: inline-block;
         }
-        .conn-active { border-color: #28a745; color: #28a745; background: rgba(40, 167, 69, 0.1); }
-
-        /* Hero Section */
+        .conn-active { border-color: #28a745; color: #28a745; background: rgba(40,167,69,0.1); }
         .hero {
-            height: 35vh; 
+            height: 35vh;
             display: flex;
             align-items: center;
             padding: 0 8%;
             background: linear-gradient(to bottom, #000, #080808);
         }
-
         .hero-content h2 { font-size: 3.5rem; letter-spacing: -1px; }
         .hero-content h2 span { color: #8a2be2; }
-
-        /* Controls */
         .upload-section {
             padding: 30px 8%;
             background-color: #080808;
             text-align: center;
             border-bottom: 1px solid #1a1a1a;
         }
-
         .btn-container {
             display: flex;
             justify-content: center;
             gap: 15px;
             margin-top: 15px;
+            flex-wrap: wrap;
         }
-
         .custom-upload-btn {
             display: inline-flex;
             align-items: center;
@@ -94,7 +81,7 @@
             transition: 0.3s;
             font-weight: bold;
         }
-
+        .custom-upload-btn:hover { background: rgba(138,43,226,0.15); }
         .publish-btn {
             background: #8a2be2;
             border: none;
@@ -103,11 +90,13 @@
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
-            display: none; 
+            display: none;
+            align-items: center;
+            gap: 10px;
             transition: 0.3s;
         }
-        .publish-btn:hover { background: #9d4edd; transform: translateY(-2px); }
-
+        .publish-btn:hover:not(:disabled) { background: #9d4edd; transform: translateY(-2px); }
+        .publish-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         #preview-box {
             max-width: 300px;
             margin: 20px auto;
@@ -116,43 +105,105 @@
             border: 2px solid #1a1a1a;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-
-        /* Gallery Grid */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 30px;
+        /* Quiz History Section */
+        .history-section {
             padding: 60px 8%;
         }
-
-      .work-item img {
-    width: 100%;
-    height: 220px; /* 🔥 fixed rectangle height */
-    object-fit: cover;
-    display: block;
-    border-bottom: 1px solid #1a1a1a;
-}
-        .work-item:hover {
-            transform: translateY(-5px);
-            border-color: #8a2be2;
-        }
-
-        .work-item img {
-            width: 100%;
-            height: auto;
-            aspect-ratio: 16 / 10;
-            object-fit: cover;
-            display: block;
-            border-bottom: 1px solid #1a1a1a;
-        }
-
-        .card-content { padding: 20px; text-align: center; }
-        .editable-title { 
-            color: white; 
-            font-size: 1.2rem;
+        .history-heading {
+            font-size: 1rem;
             font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-
+        .history-heading::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #1a1a1a;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        .work-item {
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: 0.3s;
+            position: relative;
+        }
+        .work-item:hover {
+            transform: translateY(-4px);
+            border-color: #8a2be2;
+            box-shadow: 0 8px 30px rgba(138,43,226,0.15);
+        }
+        .quiz-number-badge {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: #8a2be2;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            z-index: 2;
+        }
+       .work-item img {
+            width: 100%;
+            height: 750px;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+            background: #111;
+        }
+        .card-content {
+            padding: 16px 20px 20px;
+            border-top: 1px solid #1a1a1a;
+        }
+        .quiz-label {
+            font-size: 0.7rem;
+            color: #8a2be2;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .editable-title {
+            color: white;
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .quiz-meta {
+            font-size: 0.75rem;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .quiz-meta i { font-size: 0.7rem; }
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 20px;
+            color: #333;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+            color: #222;
+        }
+        .empty-state p { font-size: 0.9rem; }
         @media (max-width: 480px) {
             .gallery-grid { grid-template-columns: 1fr; }
             .hero-content h2 { font-size: 2.5rem; }
@@ -174,136 +225,163 @@
 
     <header class="hero">
         <div class="hero-content">
-            <div id="db-status" class="conn-tag">Connecting to Database...</div>
             <h2>QUIZZES<span>_</span></h2>
-            <p id="status-text">Your published results are synced directly with Firebase Firestore.</p>
+            <div class="conn-tag conn-active">Connected</div>
         </div>
     </header>
 
     <section class="upload-section">
         <img id="preview-box" src="" alt="Preview">
-        
         <div class="btn-container">
             <label for="image-input" class="custom-upload-btn">
                 <i class="fas fa-file-import"></i> SELECT QUIZ IMAGE
             </label>
             <input type="file" id="image-input" accept="image/*" style="display:none">
-            
             <button id="real-publish-btn" class="publish-btn">
                 <i class="fas fa-paper-plane"></i> PUBLISH NOW
             </button>
         </div>
     </section>
 
-    <main class="gallery-grid" id="gallery-root"></main>
+    <section class="history-section">
+        <p class="history-heading"><i class="fas fa-clock"></i> &nbsp;Quiz History</p>
+        <div id="gallery-grid" class="gallery-grid">
+            <div class="empty-state">
+                <i class="fas fa-folder-open"></i>
+                <p>No quizzes yet. Upload one above!</p>
+            </div>
+        </div>
+    </section>
 
-   <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ✅ FIXED CONFIG
-const firebaseConfig = {
-    apiKey: "AIzaSyCb9Pe_HFjCF5HS-xRbzfmr_7sosxOhsD0",
-    authDomain: "portfolio-7b46b.firebaseapp.com",
-    projectId: "portfolio-7b46b",
-    storageBucket: "portfolio-7b46b.appspot.com", // ✅ important fix
-    appId: "1:432309410875:web:fbc036b65790bb2846d01e"
-};
+        // ✅ PASTE YOUR FIREBASE CONFIG HERE
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-const imgInput = document.getElementById('image-input');
-const pubBtn = document.getElementById('real-publish-btn');
-const preview = document.getElementById('preview-box');
-const gallery = document.getElementById('gallery-root');
-const statusText = document.getElementById('status-text');
-const dbStatus = document.getElementById('db-status');
+        const imageInput  = document.getElementById("image-input");
+        const previewBox  = document.getElementById("preview-box");
+        const publishBtn  = document.getElementById("real-publish-btn");
+        const galleryGrid = document.getElementById("gallery-grid");
 
-dbStatus.textContent = "Database Connected ✓";
-dbStatus.classList.add('conn-active');
+        let selectedFile = null;
 
-let selectedFile = null;
+        // STEP 1 — User picks image → show preview + publish button
+        imageInput.addEventListener("change", (e) => {
+            selectedFile = e.target.files[0];
+            if (!selectedFile) return;
 
-// SELECT IMAGE
-imgInput.addEventListener('change', (e) => {
-    selectedFile = e.target.files[0];
-
-    if (selectedFile) {
-        preview.src = URL.createObjectURL(selectedFile);
-        preview.style.display = "block";
-        pubBtn.style.display = "inline-block";
-        statusText.textContent = "Image ready to publish.";
-    }
-});
-
-// UPLOAD
-pubBtn.addEventListener('click', async () => {
-    if (!selectedFile) return;
-
-    pubBtn.disabled = true;
-    statusText.textContent = "Publishing...";
-
-    try {
-        const storageRef = ref(storage, `quizzes/${Date.now()}_${selectedFile.name}`);
-        const snap = await uploadBytes(storageRef, selectedFile);
-        const url = await getDownloadURL(snap.ref);
-
-        console.log("Uploaded URL:", url);
-
-        // SAVE TO FIRESTORE
-        await addDoc(collection(db, "quizzes"), {
-            title: selectedFile.name.split('.')[0],
-            imgUrl: url,
-            createdAt: new Date()
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                previewBox.src = ev.target.result;
+                previewBox.style.display = "block";
+                publishBtn.style.display = "inline-flex";
+            };
+            reader.readAsDataURL(selectedFile);
         });
 
-        // ✅ KEEP IMAGE VISIBLE (TOP)
-        preview.src = url;
-        preview.style.display = "block";
+        // STEP 2 — Publish button clicked → save Base64 image to Firestore
+        publishBtn.addEventListener("click", () => {
+            if (!selectedFile) return;
 
-        pubBtn.style.display = "none";
-        selectedFile = null;
+            if (selectedFile.size > 900000) {
+                alert("Image too large! Please use an image under 900KB.");
+                return;
+            }
 
-        statusText.textContent = "Successfully published!";
+            publishBtn.disabled = true;
+            publishBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
 
-    } catch (err) {
-        console.error(err);
-        statusText.textContent = "Upload failed. Check rules.";
-    }
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                const base64Image = ev.target.result;
 
-    pubBtn.disabled = false;
-});
+                try {
+                    await addDoc(collection(db, "quizzes"), {
+                        imageUrl: base64Image,
+                        title: "Quiz Image",
+                        timestamp: serverTimestamp()
+                    });
+                    resetUI();
+                } catch (err) {
+                    console.error("Firestore error:", err);
+                    alert("Failed to publish. Open browser console (F12) to see the error.");
+                    resetUI();
+                }
+            };
+            reader.readAsDataURL(selectedFile);
+        });
 
-// DISPLAY IMAGES BELOW (REALTIME)
-const q = query(collection(db, "quizzes"), orderBy("createdAt", "desc"));
+        function resetUI() {
+            publishBtn.disabled = false;
+            publishBtn.innerHTML = '<i class="fas fa-paper-plane"></i> PUBLISH NOW';
+            publishBtn.style.display = "none";
+            previewBox.style.display = "none";
+            imageInput.value = "";
+            selectedFile = null;
+        }
 
-onSnapshot(q, (snapshot) => {
-    gallery.innerHTML = "";
+        // STEP 3 — Listen to Firestore in real-time → render images on page
+       // STEP 3 — Listen to Firestore in real-time → render images on page
+        const q = query(collection(db, "quizzes"), orderBy("timestamp", "desc"));
 
-    snapshot.forEach(doc => {
-        const data = doc.data();
+        onSnapshot(q, (snapshot) => {
+            galleryGrid.innerHTML = "";
 
-        const item = document.createElement('div');
-        item.className = 'work-item';
+            if (snapshot.empty) {
+                galleryGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <p>No quizzes yet. Upload one above!</p>
+                    </div>`;
+                return;
+            }
 
-        item.innerHTML = `
-            <img src="${data.imgUrl}" 
-                 onerror="this.src='https://via.placeholder.com/400x250?text=Error'">
-            <div class="card-content">
-                <b class="editable-title">${data.title || "Untitled"}</b>
-            </div>
-        `;
+            let count = snapshot.size;
 
-        gallery.appendChild(item);
-    });
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
 
-}, (error) => {
-    console.error("READ ERROR:", error);
-    statusText.textContent = "Failed to load images.";
-});
-</script>
+                // Format the timestamp nicely
+                let dateStr = "Just now";
+                if (data.timestamp) {
+                    const d = data.timestamp.toDate();
+                    dateStr = d.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric"
+                    });
+                }
+
+                const item = document.createElement("div");
+                item.className = "work-item";
+                item.innerHTML = `
+                    <div class="quiz-number-badge">QUIZ ${count}</div>
+                    <img src="${data.imageUrl}" alt="${data.title}" loading="lazy">
+                    <div class="card-content">
+                        <p class="quiz-label"><i class="fas fa-file-alt"></i> &nbsp;Quiz</p>
+                        <p class="editable-title">${data.title}</p>
+                        <p class="quiz-meta">
+                            <i class="fas fa-calendar-alt"></i> ${dateStr}
+                        </p>
+                    </div>
+                `;
+                galleryGrid.appendChild(item);
+                count--;
+            });
+        });
+    </script>
+
 </body>
 </html>
