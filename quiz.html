@@ -243,10 +243,12 @@
         </div>
     </section>
 
+
+    <body>
     <section class="history-section">
         <p class="history-heading"><i class="fas fa-clock"></i> &nbsp;Quiz History</p>
         <div id="gallery-grid" class="gallery-grid">
-            <div class="empty-state">
+            <div class="empty-state" id="empty-state">
                 <i class="fas fa-folder-open"></i>
                 <p>No quizzes yet. Upload one above!</p>
             </div>
@@ -254,134 +256,113 @@
     </section>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    // 1. Import BOTH App and Firestore (Database)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-        // ✅ PASTE YOUR FIREBASE CONFIG HERE
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+    // 2. Your specific Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyCb9Pe_HFjCF5HS-xRbzfmr_7sosxOhsD0",
+        authDomain: "portfolio-7b46b.firebaseapp.com",
+        projectId: "portfolio-7b46b",
+        storageBucket: "portfolio-7b46b.firebasestorage.app",
+        messagingSenderId: "432309410875",
+        appId: "1:432309410875:web:fbc036b65790bb2846d01e",
+        measurementId: "G-CVKF9CD08B"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    // 3. Initialize services
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app); // This connects to your database
 
-        const imageInput  = document.getElementById("image-input");
-        const previewBox  = document.getElementById("preview-box");
-        const publishBtn  = document.getElementById("real-publish-btn");
-        const galleryGrid = document.getElementById("gallery-grid");
+    // --- DOM Elements ---
+    const imageInput = document.getElementById('image-input');
+    const previewBox = document.getElementById('preview-box');
+    const publishBtn = document.getElementById('real-publish-btn');
+    const galleryGrid = document.getElementById('gallery-grid');
+    const emptyState = document.getElementById('empty-state');
 
-        let selectedFile = null;
+    let selectedImageBase64 = "";
 
-        // STEP 1 — User picks image → show preview + publish button
-        imageInput.addEventListener("change", (e) => {
-            selectedFile = e.target.files[0];
-            if (!selectedFile) return;
-
+    // --- Logic: Handle Image Selection ---
+    imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
             const reader = new FileReader();
-            reader.onload = (ev) => {
-                previewBox.src = ev.target.result;
-                previewBox.style.display = "block";
-                publishBtn.style.display = "inline-flex";
+            reader.onload = (event) => {
+                selectedImageBase64 = event.target.result;
+                previewBox.src = selectedImageBase64;
+                previewBox.style.display = 'block';
+                publishBtn.style.display = 'inline-flex';
             };
-            reader.readAsDataURL(selectedFile);
-        });
+            reader.readAsDataURL(file);
+        }
+    });
 
-        // STEP 2 — Publish button clicked → save Base64 image to Firestore
-        publishBtn.addEventListener("click", () => {
-            if (!selectedFile) return;
+    // --- Logic: Publish to Firebase ---
+    publishBtn.addEventListener('click', async () => {
+        if (!selectedImageBase64) return;
+        
+        publishBtn.disabled = true;
+        publishBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> UPLOADING...';
 
-            if (selectedFile.size > 900000) {
-                alert("Image too large! Please use an image under 900KB.");
-                return;
-            }
+        try {
+            await addDoc(collection(db, "quizzes"), {
+                image: selectedImageBase64,
+                timestamp: serverTimestamp(),
+                title: "Quiz Result"
+            });
 
-            publishBtn.disabled = true;
-            publishBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
-
-            const reader = new FileReader();
-            reader.onload = async (ev) => {
-                const base64Image = ev.target.result;
-
-                try {
-                    await addDoc(collection(db, "quizzes"), {
-                        imageUrl: base64Image,
-                        title: "Quiz Image",
-                        timestamp: serverTimestamp()
-                    });
-                    resetUI();
-                } catch (err) {
-                    console.error("Firestore error:", err);
-                    alert("Failed to publish. Open browser console (F12) to see the error.");
-                    resetUI();
-                }
-            };
-            reader.readAsDataURL(selectedFile);
-        });
-
-        function resetUI() {
+            // Reset UI
+            previewBox.style.display = 'none';
+            publishBtn.style.display = 'none';
+            imageInput.value = "";
+            
+            // Refresh the history list
+            loadQuizzes();
+        } catch (error) {
+            console.error("Error adding document: ", error);
+            alert("Upload failed! Check console for errors.");
+        } finally {
             publishBtn.disabled = false;
             publishBtn.innerHTML = '<i class="fas fa-paper-plane"></i> PUBLISH NOW';
-            publishBtn.style.display = "none";
-            previewBox.style.display = "none";
-            imageInput.value = "";
-            selectedFile = null;
         }
+    });
 
-        // STEP 3 — Listen to Firestore in real-time → render images on page
-       // STEP 3 — Listen to Firestore in real-time → render images on page
+    // --- Logic: Load History Permanently ---
+    async function loadQuizzes() {
         const q = query(collection(db, "quizzes"), orderBy("timestamp", "desc"));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) return;
 
-        onSnapshot(q, (snapshot) => {
-            galleryGrid.innerHTML = "";
+        emptyState.style.display = 'none';
+        galleryGrid.innerHTML = '';
 
-            if (snapshot.empty) {
-                galleryGrid.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-folder-open"></i>
-                        <p>No quizzes yet. Upload one above!</p>
-                    </div>`;
-                return;
-            }
-
-            let count = snapshot.size;
-
-            snapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-
-                // Format the timestamp nicely
-                let dateStr = "Just now";
-                if (data.timestamp) {
-                    const d = data.timestamp.toDate();
-                    dateStr = d.toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric"
-                    });
-                }
-
-                const item = document.createElement("div");
-                item.className = "work-item";
-                item.innerHTML = `
-                    <div class="quiz-number-badge">QUIZ ${count}</div>
-                    <img src="${data.imageUrl}" alt="${data.title}" loading="lazy">
-                    <div class="card-content">
-                        <p class="quiz-label"><i class="fas fa-file-alt"></i> &nbsp;Quiz</p>
-                        <p class="editable-title">${data.title}</p>
-                        <p class="quiz-meta">
-                            <i class="fas fa-calendar-alt"></i> ${dateStr}
-                        </p>
-                    </div>
-                `;
-                galleryGrid.appendChild(item);
-                count--;
-            });
+        querySnapshot.forEach((doc, index) => {
+            const data = doc.data();
+            const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : "Just now";
+            
+            const item = document.createElement('div');
+            item.className = 'work-item';
+            item.innerHTML = `
+                <div class="quiz-number-badge">QUIZ #${querySnapshot.size - index}</div>
+                <img src="${data.image}" alt="Quiz Image">
+                <div class="card-content">
+                    <div class="quiz-label">STUDENT SUBMISSION</div>
+                    <div class="editable-title">${data.title}</div>
+                    <div class="quiz-meta"><i class="fas fa-calendar"></i> ${date}</div>
+                </div>
+            `;
+            galleryGrid.appendChild(item);
         });
-    </script>
+    }
 
+    // Load existing history on page load
+    loadQuizzes();
+</script>
+</body>
+</html>
+    
 </body>
 </html>
